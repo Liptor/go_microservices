@@ -98,3 +98,28 @@ func (s *Set) Get(ctx context.Context, filters ...internal.Filter) ([]internal.D
 	}
 	return getResp.Documents, nil
 }
+
+func (s *Set) ServiceStatus(ctx context.Context) (int, error) {
+	resp, err := s.ServiceStatusEndpoint(ctx, ServiceStatusRequest{})
+	svcStatusResp := resp.(ServiceStatusResponse)
+	if err != nil {
+		return  svcStatusResp.Code, err
+	}
+	if svcStatusResp.Err != "" {
+		return svcStatusResp.Code, errors.New(svcStatusResp.Err)
+	}
+	return svcStatusResp.Code, nil
+}
+
+func (s *Set) AddDocument(ctx context.Context, doc *internal.Document) (string, error) {
+	resp, err := s.AddDocumentEndpoint(ctx, AddDocumentRequest{Document: doc})
+	if err != nil {
+		return "", err
+	}
+	adResp := resp.(AddDocumentResponse)
+	if adResp.Err != "" {
+		return "", errors.New(adResp.Err)
+	}
+	return adResp.TicketID, nil
+}
+
